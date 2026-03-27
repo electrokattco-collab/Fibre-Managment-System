@@ -1,0 +1,418 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Pre-Order Logistics | FibreForge</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00435a",
+              secondary: "#005c7a",
+              accent: "#f59e0b" /* Amber for pending work */,
+              "surface-container": "#eceef1",
+            },
+            fontFamily: { headline: ["Manrope"], body: ["Inter"] },
+          },
+        },
+      };
+    </script>
+    <style>
+      .order-row {
+        transition: all 0.2s ease;
+      }
+    </style>
+  </head>
+  <body class="bg-[#f8f9fc] font-body text-[#191c1e]">
+    <div
+      id="toast"
+      class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] opacity-0 transition-all duration-300 pointer-events-none"
+    >
+      <div
+        class="bg-primary text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/20"
+      >
+        <span class="material-symbols-outlined text-sm">engineering</span>
+        <span id="toast-message" class="text-sm font-bold"
+          >Dispatch successful</span
+        >
+      </div>
+    </div>
+
+    <header
+      class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-16 border-b border-slate-200"
+    >
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-cyan-900">hub</span>
+        <span
+          class="font-manrope text-xl font-black tracking-tighter text-cyan-900"
+          >FibreForge</span
+        >
+      </div>
+      <nav class="hidden md:flex gap-8">
+        <a
+          class="text-slate-500 font-medium hover:text-primary"
+          href="dashboard.html"
+          >Dashboard</a
+        >
+        <a
+          class="text-slate-500 font-medium hover:text-primary"
+          href="unconnected.html"
+          >Unconnected</a
+        >
+        <a
+          class="text-primary font-bold border-b-2 border-primary py-1"
+          href="#"
+          >Pre-Orders</a
+        >
+      </nav>
+      <div class="flex items-center gap-2">
+        <span
+          class="text-xs font-bold text-slate-400 bg-slate-100 px-2 py-1 rounded"
+          >V 1.0.4</span
+        >
+      </div>
+    </header>
+
+    <main class="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
+      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+          <a
+            href="dashboard.html"
+            class="flex items-center gap-2 text-sm font-bold text-primary mb-2 hover:underline"
+          >
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            Back to Dashboard
+          </a>
+          <h1 class="font-headline text-3xl font-extrabold text-primary">
+            Pre-Order & Installation
+          </h1>
+          <p class="text-slate-500 font-medium">
+            Manage pending installs and hand-off to the trial phase.
+          </p>
+        </div>
+        <button
+          class="bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2 shadow-lg shadow-primary/20"
+        >
+          <span class="material-symbols-outlined text-sm">calendar_month</span>
+          Schedule Bulk Installs
+        </button>
+      </div>
+
+      <section class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div
+          onclick="filterTable('all')"
+          class="cursor-pointer bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-primary transition-all"
+        >
+          <p
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+          >
+            Total Orders
+          </p>
+          <p class="text-3xl font-black text-slate-800">1,240</p>
+        </div>
+        <div
+          onclick="filterTable('pending')"
+          class="cursor-pointer bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-accent transition-all"
+        >
+          <p
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+          >
+            Awaiting Install
+          </p>
+          <p class="text-3xl font-black text-accent">312</p>
+        </div>
+        <div
+          onclick="filterTable('scheduled')"
+          class="cursor-pointer bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-blue-500 transition-all"
+        >
+          <p
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+          >
+            Scheduled Today
+          </p>
+          <p class="text-3xl font-black text-blue-600">24</p>
+        </div>
+        <div
+          onclick="filterTable('completed')"
+          class="cursor-pointer bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:border-green-500 transition-all"
+        >
+          <p
+            class="text-[10px] font-bold text-slate-400 uppercase tracking-widest"
+          >
+            Recently Installed
+          </p>
+          <p class="text-3xl font-black text-green-600">89</p>
+        </div>
+      </section>
+
+      <section
+        class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+      >
+        <div
+          class="flex border-b border-slate-200 bg-slate-50/50 overflow-x-auto"
+        >
+          <button
+            onclick="filterTable('all')"
+            class="tab-btn active-tab px-6 py-4 text-sm font-bold border-b-2 border-primary text-primary whitespace-nowrap"
+          >
+            All Pre-orders
+          </button>
+          <button
+            onclick="filterTable('pending')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100 whitespace-nowrap"
+          >
+            Pending Tech
+          </button>
+          <button
+            onclick="filterTable('scheduled')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100 whitespace-nowrap"
+          >
+            Confirmed Dates
+          </button>
+          <button
+            onclick="filterTable('completed')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100 whitespace-nowrap"
+          >
+            Ready for Trial
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 font-bold"
+              >
+                <th class="px-6 py-4">Customer</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4">Install Date</th>
+                <th class="px-6 py-4 text-right">Logistics Action</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr data-status="pending" class="order-row hover:bg-slate-50/50">
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">David Peterson</div>
+                  <div class="text-xs text-slate-400">
+                    102 Sky Tower, Block A
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold uppercase"
+                    >Pending Tech</span
+                  >
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-500">Not Scheduled</td>
+                <td class="px-6 py-4 text-right">
+                  <button
+                    onclick="triggerLogistic('dispatch', 'David Peterson')"
+                    class="bg-primary text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-primary-container flex items-center gap-2 ml-auto"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >engineering</span
+                    >
+                    Dispatch Team
+                  </button>
+                </td>
+              </tr>
+
+              <tr data-status="scheduled" class="order-row hover:bg-blue-50/20">
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">Emily Blunt</div>
+                  <div class="text-xs text-slate-400">14 Willow Creek</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-md bg-blue-100 text-blue-700 text-[10px] font-bold uppercase"
+                    >Scheduled</span
+                  >
+                </td>
+                <td class="px-6 py-4 text-sm font-bold text-slate-700">
+                  Oct 29 @ 10:00 AM
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button
+                    onclick="triggerLogistic('reschedule', 'Emily Blunt')"
+                    class="text-slate-400 hover:text-primary transition-colors"
+                  >
+                    <span class="material-symbols-outlined">edit_calendar</span>
+                  </button>
+                </td>
+              </tr>
+
+              <tr
+                data-status="completed"
+                class="order-row hover:bg-green-50/20"
+              >
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">Marcus Vane</div>
+                  <div class="text-xs text-slate-400">99 Harbour Way</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-md bg-green-100 text-green-700 text-[10px] font-bold uppercase"
+                    >Installed</span
+                  >
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-400 italic font-medium">
+                  Completed Oct 25
+                </td>
+                <td class="px-6 py-4 text-right">
+                  <button
+                    onclick="triggerLogistic('handover', 'Marcus Vane')"
+                    class="bg-green-600 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-green-700 flex items-center gap-2 ml-auto shadow-sm"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >forward</span
+                    >
+                    Handover to Trial
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <div class="flex items-center gap-3 pb-2 border-b border-slate-200">
+          <span class="material-symbols-outlined text-primary"
+            >local_shipping</span
+          >
+          <h2 class="font-headline text-lg font-bold text-primary">
+            Recent Logistics Updates
+          </h2>
+        </div>
+
+        <div id="log-container" class="grid grid-cols-1 gap-3">
+          <div
+            class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center opacity-60"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400"
+              >
+                <span class="material-symbols-outlined text-sm">task_alt</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">System Sync Complete</p>
+                <p class="text-xs text-slate-500">
+                  Install database synchronized with technician handhelds.
+                </p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400">Yesterday</span>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // 1. Filtering
+      function filterTable(status) {
+        const tabs = document.querySelectorAll(".tab-btn");
+        tabs.forEach((tab) => {
+          tab.classList.remove(
+            "border-b-2",
+            "border-primary",
+            "text-primary",
+            "font-bold",
+          );
+          tab.classList.add("text-slate-500", "font-medium");
+        });
+
+        const activeTab = Array.from(tabs).find(
+          (t) =>
+            t.innerText.toLowerCase().includes(status) ||
+            (status === "all" && t.innerText.includes("All")),
+        );
+        if (activeTab) {
+          activeTab.classList.add(
+            "border-b-2",
+            "border-primary",
+            "text-primary",
+            "font-bold",
+          );
+          activeTab.classList.remove("text-slate-500", "font-medium");
+        }
+
+        const rows = document.querySelectorAll(".order-row");
+        rows.forEach((row) => {
+          if (status === "all" || row.getAttribute("data-status") === status) {
+            row.style.display = "table-row";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      // 2. Logistics Actions
+      function triggerLogistic(type, customer) {
+        const toast = document.getElementById("toast");
+        const toastMsg = document.getElementById("toast-message");
+        const log = document.getElementById("log-container");
+
+        let msg = "";
+        let logText = "";
+        let icon = "";
+        let color = "";
+
+        if (type === "dispatch") {
+          msg = `Dispatching Technician to ${customer}...`;
+          logText = `Tech Team Alpha assigned to installation at ${customer}.`;
+          icon = "engineering";
+          color = "bg-primary text-white";
+        } else if (type === "handover") {
+          msg = `Handing ${customer} over to Trial Management...`;
+          logText = `Installation verified. Customer moved to Active Trial list.`;
+          icon = "forward";
+          color = "bg-green-600 text-white";
+        } else {
+          msg = `Opening Reschedule Calendar for ${customer}...`;
+          logText = `Reschedule request initiated for ${customer}.`;
+          icon = "calendar_today";
+          color = "bg-blue-600 text-white";
+        }
+
+        // Show Toast
+        toastMsg.innerText = msg;
+        toast.classList.add("opacity-100", "translate-y-[-20px]");
+        setTimeout(
+          () => toast.classList.remove("opacity-100", "translate-y-[-20px]"),
+          3000,
+        );
+
+        // Update Log
+        const newItem = document.createElement("div");
+        newItem.className =
+          "bg-white p-4 rounded-xl border-l-4 border-primary border-y border-r border-slate-200 flex justify-between items-center animate-pulse";
+        newItem.innerHTML = `
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full ${color} flex items-center justify-center">
+                <span class="material-symbols-outlined text-sm">${icon}</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">${type.toUpperCase()} Processed</p>
+                <p class="text-xs text-slate-500">${logText}</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold text-primary uppercase">Just Now</span>
+        `;
+        log.prepend(newItem);
+        setTimeout(() => newItem.classList.remove("animate-pulse"), 2000);
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,363 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Trial Management | FibreForge</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00435a",
+              "primary-container": "#005c7a",
+              "surface-container": "#eceef1",
+              "on-surface-variant": "#40484d",
+            },
+            fontFamily: { headline: ["Manrope"], body: ["Inter"] },
+          },
+        },
+      };
+    </script>
+    <style>
+      tr {
+        transition: all 0.2s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="bg-[#f8f9fc] font-body text-[#191c1e]">
+    <header
+      class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-16 border-b border-slate-200"
+    >
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-cyan-900">hub</span>
+        <span
+          class="font-manrope text-xl font-black tracking-tighter text-cyan-900"
+          >FibreForge</span
+        >
+      </div>
+      <nav class="hidden md:flex gap-8">
+        <a
+          class="text-slate-500 font-medium hover:text-primary"
+          href="dashboard.html"
+          >Dashboard</a
+        >
+        <a
+          class="text-primary font-bold border-b-2 border-primary py-1"
+          href="#"
+          >Customers</a
+        >
+        <a class="text-slate-500 font-medium" href="#">Queue</a>
+      </nav>
+      <div class="w-8 h-8 rounded-full bg-slate-200"></div>
+    </header>
+
+    <main class="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto space-y-10">
+      <div>
+        <a
+          href="dashboard.html"
+          class="flex items-center gap-2 text-sm font-bold text-primary mb-2 hover:underline"
+        >
+          <span class="material-symbols-outlined text-sm">arrow_back</span> Back
+          to Dashboard
+        </a>
+        <h1 class="font-headline text-3xl font-extrabold text-primary">
+          Trial Customer Management
+        </h1>
+      </div>
+
+      <section class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div
+          onclick="filterTable('active')"
+          class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-green-500 transition-colors"
+        >
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Active Trials
+          </p>
+          <p class="text-3xl font-black text-green-600">842</p>
+        </div>
+        <div
+          onclick="filterTable('pending')"
+          class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-yellow-500 transition-colors"
+        >
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Pending Expiry
+          </p>
+          <p class="text-3xl font-black text-yellow-600">412</p>
+        </div>
+        <div
+          onclick="filterTable('expired')"
+          class="cursor-pointer bg-white p-5 rounded-xl border border-slate-200 shadow-sm hover:border-red-500 transition-colors"
+        >
+          <p class="text-xs font-bold text-slate-500 uppercase tracking-widest">
+            Expired Already
+          </p>
+          <p class="text-3xl font-black text-red-600">174</p>
+        </div>
+      </section>
+
+      <section
+        class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+      >
+        <div class="flex border-b border-slate-200 bg-slate-50/50">
+          <button
+            onclick="filterTable('all')"
+            class="tab-btn active-tab px-6 py-4 text-sm font-bold border-b-2 border-primary text-primary"
+          >
+            All Customers
+          </button>
+          <button
+            onclick="filterTable('active')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100"
+          >
+            Trial Active
+          </button>
+          <button
+            onclick="filterTable('pending')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100"
+          >
+            Pending Expiry
+          </button>
+          <button
+            onclick="filterTable('expired')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100"
+          >
+            Expired
+          </button>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 font-bold"
+              >
+                <th class="px-6 py-4">Customer Details</th>
+                <th class="px-6 py-4">Status</th>
+                <th class="px-6 py-4">Trial Ends</th>
+                <th class="px-6 py-4 text-right">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100">
+              <tr
+                data-status="active"
+                class="customer-row hover:bg-slate-50/50"
+              >
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">Johnathan Smith</div>
+                  <div class="text-xs text-slate-500">123 Fibre Lane</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-full bg-green-100 text-green-700 text-[10px] font-bold uppercase"
+                    >Active</span
+                  >
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600">Oct 30, 2023</td>
+                <td class="px-6 py-4 text-right">
+                  <button class="text-slate-400 hover:text-primary">
+                    <span class="material-symbols-outlined">visibility</span>
+                  </button>
+                </td>
+              </tr>
+              <tr
+                data-status="pending"
+                class="customer-row hover:bg-slate-50/50 bg-yellow-50/20"
+              >
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">Sarah Jenkins</div>
+                  <div class="text-xs text-slate-500">45 Oak Street</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-full bg-yellow-100 text-yellow-700 text-[10px] font-bold uppercase"
+                    >Expiring</span
+                  >
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600 font-bold">
+                  Oct 27, 2023
+                </td>
+                <td class="px-6 py-4 text-right flex justify-end gap-2">
+                  <button
+                    class="p-2 rounded-lg bg-white border border-slate-200 text-blue-600 hover:bg-blue-50"
+                  >
+                    <span class="material-symbols-outlined text-sm">call</span>
+                  </button>
+                  <button
+                    class="p-2 rounded-lg bg-white border border-slate-200 text-purple-600 hover:bg-purple-50"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >chat_bubble</span
+                    >
+                  </button>
+                </td>
+              </tr>
+              <tr
+                data-status="expired"
+                class="customer-row hover:bg-slate-50/50 bg-red-50/10"
+              >
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">Mike Ross</div>
+                  <div class="text-xs text-slate-500">89 Industrial Way</div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-full bg-red-100 text-red-700 text-[10px] font-bold uppercase"
+                    >Expired</span
+                  >
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-400">Oct 20, 2023</td>
+                <td class="px-6 py-4 text-right">
+                  <button
+                    class="bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold hover:bg-primary-container"
+                  >
+                    Send Signup Link
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <div class="flex items-center gap-3 pb-2 border-b border-slate-200">
+          <span
+            class="material-symbols-outlined text-primary"
+            data-icon="history"
+            >history</span
+          >
+          <h2 class="font-headline text-lg font-bold text-primary">
+            Recent Trial Activities
+          </h2>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3">
+          <div
+            class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center hover:shadow-sm transition-shadow"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600"
+              >
+                <span class="material-symbols-outlined text-sm">call</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">Vicidial Call Logged</p>
+                <p class="text-xs text-slate-500">
+                  Sales rep attempted contact with
+                  <span class="font-semibold text-slate-700"
+                    >Sarah Jenkins</span
+                  >
+                  (Pending Expiry).
+                </p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase"
+              >12 Mins Ago</span
+            >
+          </div>
+
+          <div
+            class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center hover:shadow-sm transition-shadow"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-purple-50 flex items-center justify-center text-purple-600"
+              >
+                <span class="material-symbols-outlined text-sm"
+                  >chat_bubble</span
+                >
+              </div>
+              <div>
+                <p class="text-sm font-bold">AISPR WhatsApp Sent</p>
+                <p class="text-xs text-slate-500">
+                  Automated reminder sent to
+                  <span class="font-semibold text-slate-700"
+                    >54 Trial Users</span
+                  >
+                  expiring in 48h.
+                </p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase"
+              >1 Hour Ago</span
+            >
+          </div>
+
+          <div
+            class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center hover:shadow-sm transition-shadow"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center text-green-600"
+              >
+                <span class="material-symbols-outlined text-sm">mail</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">Signup Link Dispatched</p>
+                <p class="text-xs text-slate-500">
+                  Email form with signup link sent to
+                  <span class="font-semibold text-slate-700">Mike Ross</span>
+                  (Expired).
+                </p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase"
+              >3 Hours Ago</span
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      function filterTable(status) {
+        // Tab UI
+        const tabs = document.querySelectorAll(".tab-btn");
+        tabs.forEach((tab) => {
+          tab.classList.remove(
+            "border-b-2",
+            "border-primary",
+            "text-primary",
+            "font-bold",
+          );
+          tab.classList.add("text-slate-500", "font-medium");
+        });
+
+        const activeTab = Array.from(tabs).find(
+          (t) =>
+            t.innerText.toLowerCase().includes(status) ||
+            (status === "all" && t.innerText.includes("All")),
+        );
+        if (activeTab) {
+          activeTab.classList.add(
+            "border-b-2",
+            "border-primary",
+            "text-primary",
+            "font-bold",
+          );
+          activeTab.classList.remove("text-slate-500", "font-medium");
+        }
+
+        // Table Filter
+        const rows = document.querySelectorAll(".customer-row");
+        rows.forEach((row) => {
+          if (status === "all" || row.getAttribute("data-status") === status) {
+            row.style.display = "table-row";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+    </script>
+  </body>
+</html>

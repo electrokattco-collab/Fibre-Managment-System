@@ -1,0 +1,450 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Unconnected Leads | FibreForge</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00435a",
+              "primary-container": "#005c7a",
+              secondary: "#4a626d",
+              "surface-container": "#eceef1",
+            },
+            fontFamily: { headline: ["Manrope"], body: ["Inter"] },
+          },
+        },
+      };
+    </script>
+    <style>
+      .customer-row {
+        transition: all 0.2s ease-in-out;
+      }
+    </style>
+  </head>
+  <body class="bg-[#f8f9fc] font-body text-[#191c1e]">
+    <div
+      id="toast"
+      class="fixed bottom-10 left-1/2 -translate-x-1/2 z-[100] opacity-0 transition-all duration-300 pointer-events-none"
+    >
+      <div
+        class="bg-primary text-white px-6 py-3 rounded-full shadow-2xl flex items-center gap-3 border border-white/20"
+      >
+        <span class="material-symbols-outlined text-sm">rocket_launch</span>
+        <span id="toast-message" class="text-sm font-bold"
+          >Dispatch successful</span
+        >
+      </div>
+    </div>
+
+    <header
+      class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-16 border-b border-slate-200"
+    >
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-cyan-900">hub</span>
+        <span
+          class="font-manrope text-xl font-black tracking-tighter text-cyan-900"
+          >FibreForge</span
+        >
+      </div>
+      <nav class="hidden md:flex gap-8">
+        <a
+          class="text-slate-500 font-medium hover:text-primary"
+          href="dashboard.html"
+          >Dashboard</a
+        >
+        <a
+          class="text-primary font-bold border-b-2 border-primary py-1"
+          href="#"
+          >Unconnected</a
+        >
+        <a
+          class="text-slate-500 font-medium hover:text-primary"
+          href="custOnTrial.html"
+          >Trials</a
+        >
+      </nav>
+      <button
+        class="bg-primary text-white text-xs font-bold px-4 py-2 rounded-lg flex items-center gap-2"
+      >
+        <span class="material-symbols-outlined text-sm">share</span> Export for
+        Field Team
+      </button>
+    </header>
+
+    <main class="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto space-y-8">
+      <div>
+        <a
+          href="dashboard.html"
+          class="flex items-center gap-2 text-sm font-bold text-primary mb-2 hover:underline"
+        >
+          <span class="material-symbols-outlined text-sm">arrow_back</span> Back
+          to Dashboard
+        </a>
+        <h1 class="font-headline text-3xl font-extrabold text-primary">
+          Unconnected Address Discovery
+        </h1>
+        <p class="text-slate-500 font-medium">
+          Identify coverage gaps and eligible trial locations.
+        </p>
+      </div>
+
+      <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div
+          onclick="filterTable('coverage')"
+          class="cursor-pointer bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-primary transition-all group"
+        >
+          <div class="flex justify-between items-start">
+            <div>
+              <p
+                class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+              >
+                Active Coverage
+              </p>
+              <p class="text-4xl font-black text-primary mt-1">2,104</p>
+            </div>
+            <span
+              class="material-symbols-outlined text-slate-200 group-hover:text-primary transition-colors text-4xl"
+              >map</span
+            >
+          </div>
+          <p class="text-xs text-slate-500 mt-4">
+            Addresses with fibre reach but <strong>no connection</strong>.
+          </p>
+        </div>
+        <div
+          onclick="filterTable('pretrial')"
+          class="cursor-pointer bg-white p-6 rounded-2xl border border-slate-200 shadow-sm hover:border-secondary transition-all group"
+        >
+          <div class="flex justify-between items-start">
+            <div>
+              <p
+                class="text-xs font-bold text-slate-400 uppercase tracking-widest"
+              >
+                Pre-Trial Coverage
+              </p>
+              <p class="text-4xl font-black text-secondary mt-1">1,788</p>
+            </div>
+            <span
+              class="material-symbols-outlined text-slate-200 group-hover:text-secondary transition-colors text-4xl"
+              >location_searching</span
+            >
+          </div>
+          <p class="text-xs text-slate-500 mt-4">
+            Upcoming zones eligible for <strong>pre-order trials</strong>.
+          </p>
+        </div>
+      </section>
+
+      <section
+        class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+      >
+        <div class="flex border-b border-slate-200 bg-slate-50/50">
+          <button
+            onclick="filterTable('all')"
+            class="tab-btn active-tab px-6 py-4 text-sm font-bold border-b-2 border-primary text-primary"
+          >
+            All Addresses
+          </button>
+          <button
+            onclick="filterTable('coverage')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100"
+          >
+            Live Coverage
+          </button>
+          <button
+            onclick="filterTable('pretrial')"
+            class="tab-btn px-6 py-4 text-sm font-medium text-slate-500 hover:bg-slate-100"
+          >
+            Pre-Trial Only
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr
+                class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 font-bold"
+              >
+                <th class="px-6 py-4">Address & Location</th>
+                <th class="px-6 py-4">Category</th>
+                <th class="px-6 py-4">Trial Eligibility</th>
+                <th class="px-6 py-4 text-right">Sales Actions</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100" id="address-table-body">
+              <tr
+                data-status="coverage"
+                class="customer-row hover:bg-slate-50/50"
+              >
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">12 Greenview Terrace</div>
+                  <div class="text-[10px] text-slate-400 font-mono">
+                    ID: CF-99201
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold uppercase"
+                    >Live Coverage</span
+                  >
+                </td>
+                <td class="px-6 py-4">
+                  <div
+                    class="flex items-center gap-2 text-green-600 font-bold text-xs"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >verified</span
+                    >
+                    Eligible for Trial
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right flex justify-end gap-2">
+                  <button
+                    onclick="triggerLeadAction('field', '12 Greenview Terrace')"
+                    title="Send to Field Team"
+                    class="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-primary transition-all"
+                  >
+                    <span class="material-symbols-outlined text-sm">hail</span>
+                  </button>
+                  <button
+                    onclick="
+                      triggerLeadAction('signup', '12 Greenview Terrace')
+                    "
+                    class="bg-primary text-white px-3 py-1.5 rounded-lg text-[11px] font-bold hover:bg-primary-container"
+                  >
+                    Attempt Sign-up
+                  </button>
+                </td>
+              </tr>
+
+              <tr
+                data-status="coverage"
+                class="customer-row hover:bg-slate-50/50"
+              >
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">44 Marina Boulevard</div>
+                  <div class="text-[10px] text-slate-400 font-mono">
+                    ID: CF-88123
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-md bg-slate-100 text-slate-600 text-[10px] font-bold uppercase"
+                    >Live Coverage</span
+                  >
+                </td>
+                <td class="px-6 py-4">
+                  <div
+                    class="flex items-center gap-2 text-red-500 font-bold text-xs opacity-60"
+                  >
+                    <span class="material-symbols-outlined text-sm">block</span>
+                    Trial Used/Expired
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right flex justify-end gap-2">
+                  <button
+                    onclick="triggerLeadAction('field', '44 Marina Boulevard')"
+                    class="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-primary"
+                  >
+                    <span class="material-symbols-outlined text-sm">hail</span>
+                  </button>
+                  <button
+                    onclick="triggerLeadAction('signup', '44 Marina Boulevard')"
+                    class="bg-slate-200 text-slate-600 px-3 py-1.5 rounded-lg text-[11px] font-bold"
+                  >
+                    Standard Sign-up
+                  </button>
+                </td>
+              </tr>
+
+              <tr
+                data-status="pretrial"
+                class="customer-row hover:bg-slate-50/50 bg-slate-50/30"
+              >
+                <td class="px-6 py-4">
+                  <div class="font-bold text-sm">78 Sunset Ridge (Block B)</div>
+                  <div class="text-[10px] text-slate-400 font-mono">
+                    ID: PT-1102
+                  </div>
+                </td>
+                <td class="px-6 py-4">
+                  <span
+                    class="px-2 py-1 rounded-md bg-secondary text-white text-[10px] font-bold uppercase"
+                    >Pre-Trial Zone</span
+                  >
+                </td>
+                <td class="px-6 py-4">
+                  <div
+                    class="flex items-center gap-2 text-blue-600 font-bold text-xs"
+                  >
+                    <span class="material-symbols-outlined text-sm"
+                      >schedule</span
+                    >
+                    Pre-order Eligible
+                  </div>
+                </td>
+                <td class="px-6 py-4 text-right flex justify-end gap-2">
+                  <button
+                    onclick="triggerLeadAction('field', '78 Sunset Ridge')"
+                    class="p-2 rounded-lg bg-white border border-slate-200 text-slate-600 hover:text-primary"
+                  >
+                    <span class="material-symbols-outlined text-sm">hail</span>
+                  </button>
+                  <button
+                    onclick="triggerLeadAction('signup', '78 Sunset Ridge')"
+                    class="bg-primary text-white px-3 py-1.5 rounded-lg text-[11px] font-bold"
+                  >
+                    Pre-Order
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="space-y-4">
+        <div
+          class="flex items-center justify-between pb-2 border-b border-slate-200"
+        >
+          <div class="flex items-center gap-3">
+            <span class="material-symbols-outlined text-primary"
+              >analytics</span
+            >
+            <h2 class="font-headline text-lg font-bold text-primary">
+              Sales & Field Activity
+            </h2>
+          </div>
+          <button class="text-xs font-bold text-primary hover:underline">
+            Clear History
+          </button>
+        </div>
+
+        <div id="activity-log" class="grid grid-cols-1 gap-3">
+          <div
+            class="bg-white p-4 rounded-xl border border-slate-200 flex justify-between items-center"
+          >
+            <div class="flex items-center gap-4">
+              <div
+                class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-600"
+              >
+                <span class="material-symbols-outlined text-sm">group_add</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">Manual Sign-up Started</p>
+                <p class="text-xs text-slate-500">
+                  Sales rep opened signup flow for
+                  <span class="font-semibold text-slate-700"
+                    >44 Marina Boulevard</span
+                  >.
+                </p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold text-slate-400 uppercase"
+              >2 Hours Ago</span
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // 1. Filtering Logic
+      function filterTable(status) {
+        const tabs = document.querySelectorAll(".tab-btn");
+        tabs.forEach((tab) => {
+          tab.classList.remove(
+            "border-b-2",
+            "border-primary",
+            "text-primary",
+            "font-bold",
+          );
+          tab.classList.add("text-slate-500", "font-medium");
+        });
+
+        const activeTab = Array.from(tabs).find(
+          (t) =>
+            t.innerText.toLowerCase().includes(status) ||
+            (status === "all" && t.innerText.includes("All")),
+        );
+        if (activeTab) {
+          activeTab.classList.add(
+            "border-b-2",
+            "border-primary",
+            "text-primary",
+            "font-bold",
+          );
+          activeTab.classList.remove("text-slate-500", "font-medium");
+        }
+
+        const rows = document.querySelectorAll(".customer-row");
+        rows.forEach((row) => {
+          if (status === "all" || row.getAttribute("data-status") === status) {
+            row.style.display = "table-row";
+          } else {
+            row.style.display = "none";
+          }
+        });
+      }
+
+      // 2. Lead Action Logic
+      function triggerLeadAction(type, address) {
+        let message = "";
+        let logMsg = "";
+        let icon = "";
+
+        if (type === "field") {
+          message = `Dispatching coordinates for ${address} to field team...`;
+          logMsg = `Address data forwarded to field team for approach.`;
+          icon = "hail";
+        } else {
+          message = `Opening Sales Portal for ${address}...`;
+          logMsg = `Sales team attempted sign-up with resident.`;
+          icon = "person_add";
+        }
+
+        // Show Toast
+        const toast = document.getElementById("toast");
+        document.getElementById("toast-message").innerText = message;
+        toast.classList.add("opacity-100", "translate-y-[-20px]");
+        setTimeout(
+          () => toast.classList.remove("opacity-100", "translate-y-[-20px]"),
+          3000,
+        );
+
+        // Update Activity Log
+        const log = document.getElementById("activity-log");
+        const newItem = document.createElement("div");
+        newItem.className =
+          "bg-primary/5 p-4 rounded-xl border border-primary/20 flex justify-between items-center animate-pulse";
+        newItem.innerHTML = `
+            <div class="flex items-center gap-4">
+              <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white">
+                <span class="material-symbols-outlined text-sm">${icon}</span>
+              </div>
+              <div>
+                <p class="text-sm font-bold">${type === "field" ? "Field Dispatch" : "Sales Lead"} Triggered</p>
+                <p class="text-xs text-slate-500">${address}: ${logMsg}</p>
+              </div>
+            </div>
+            <span class="text-[10px] font-bold text-primary uppercase">Just Now</span>
+        `;
+        log.prepend(newItem);
+        setTimeout(() => newItem.classList.remove("animate-pulse"), 2000);
+      }
+    </script>
+  </body>
+</html>

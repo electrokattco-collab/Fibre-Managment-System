@@ -1,0 +1,619 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>FibreForge | Data Management Dashboard</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error-container": "#93000a",
+              "tertiary-fixed": "#a0f0f0",
+              "surface-variant": "#e1e3e5",
+              "on-secondary-fixed-variant": "#324a55",
+              "on-tertiary-container": "#87d7d7",
+              secondary: "#4a626d",
+              "secondary-container": "#cae4f1",
+              "primary-fixed": "#c1e8ff",
+              "secondary-fixed-dim": "#b1cad7",
+              "on-background": "#191c1e",
+              "tertiary-container": "#005f5f",
+              "on-primary-container": "#90d3f5",
+              "surface-bright": "#f8f9fc",
+              "surface-container-lowest": "#ffffff",
+              "surface-container": "#eceef1",
+              "inverse-surface": "#2e3133",
+              "on-secondary-fixed": "#041e28",
+              outline: "#70787e",
+              "inverse-primary": "#8dcff2",
+              "outline-variant": "#bfc8ce",
+              "on-surface": "#191c1e",
+              "tertiary-fixed-dim": "#84d4d3",
+              error: "#ba1a1a",
+              tertiary: "#004545",
+              "on-secondary": "#ffffff",
+              "inverse-on-surface": "#eff1f3",
+              "secondary-fixed": "#cde6f3",
+              "surface-container-highest": "#e1e3e5",
+              "on-primary-fixed-variant": "#004d66",
+              primary: "#00435a",
+              "error-container": "#ffdad6",
+              "surface-tint": "#176684",
+              "on-tertiary": "#ffffff",
+              "primary-container": "#005c7a",
+              surface: "#f8f9fc",
+              "on-secondary-container": "#4e6671",
+              "on-surface-variant": "#40484d",
+              "on-tertiary-fixed-variant": "#004f4f",
+              background: "#f8f9fc",
+              "surface-container-low": "#f2f4f6",
+              "on-primary": "#ffffff",
+              "on-error": "#ffffff",
+              "on-tertiary-fixed": "#002020",
+              "on-primary-fixed": "#001e2b",
+              "surface-dim": "#d8dadd",
+              "primary-fixed-dim": "#8dcff2",
+              "surface-container-high": "#e6e8eb",
+            },
+            fontFamily: {
+              headline: ["Manrope"],
+              body: ["Inter"],
+              label: ["Inter"],
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .material-symbols-outlined {
+        font-variation-settings:
+          "FILL" 0,
+          "wght" 400,
+          "GRAD" 0,
+          "opsz" 24;
+      }
+      .connectivity-pulse {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #84d4d3;
+        box-shadow: 0 0 0 rgba(132, 212, 211, 0.4);
+        animation: pulse 2s infinite;
+      }
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(132, 212, 211, 0.7);
+        }
+        70% {
+          transform: scale(1);
+          box-shadow: 0 0 0 10px rgba(132, 212, 211, 0);
+        }
+        100% {
+          transform: scale(0.95);
+          box-shadow: 0 0 0 0 rgba(132, 212, 211, 0);
+        }
+      }
+    </style>
+    <style>
+      body {
+        min-height: max(884px, 100dvh);
+      }
+    </style>
+  </head>
+  <body class="bg-surface font-body text-on-surface">
+    <header
+      class="fixed top-0 w-full z-50 bg-slate-50/85 backdrop-blur-md shadow-[0_12px_40px_rgba(0,30,43,0.08)] flex justify-between items-center px-6 h-16"
+    >
+      <div class="flex items-center gap-3">
+        <span
+          class="material-symbols-outlined text-cyan-900 text-2xl"
+          data-icon="hub"
+          >hub</span
+        >
+        <span
+          class="font-manrope text-2xl font-black tracking-tighter text-cyan-900"
+          >FibreForge</span
+        >
+      </div>
+      <nav class="hidden md:flex gap-8">
+        <a
+          class="text-cyan-700 font-bold border-b-2 border-cyan-700 py-1 transition-colors"
+          href="#"
+          >Dashboard</a
+        >
+        <a
+          class="text-slate-500 font-medium hover:bg-slate-200/50 transition-colors py-1 px-2 rounded"
+          href="#"
+          >Customers</a
+        >
+        <a
+          class="text-slate-500 font-medium hover:bg-slate-200/50 transition-colors py-1 px-2 rounded"
+          href="#"
+          >Queue</a
+        >
+        <a
+          class="text-slate-500 font-medium hover:bg-slate-200/50 transition-colors py-1 px-2 rounded"
+          href="#"
+          >Map</a
+        >
+      </nav>
+      <div class="flex items-center gap-4">
+        <button
+          class="material-symbols-outlined text-on-surface-variant hover:bg-slate-200/50 p-2 rounded-full transition-colors"
+          data-icon="notifications"
+        >
+          notifications
+        </button>
+        <img
+          alt="User Profile"
+          class="w-8 h-8 rounded-full border border-outline-variant/15"
+          src="https://lh3.googleusercontent.com/aida-public/AB6AXuDGATxMSmBQS2q8jb2VAvfFxL-C1MUG4yEM4Fl1ge4Z95sj-Ks6dI6nynY3FmMB0rONWcSEP_vSOSJnxAUiH4a5FGbwlvmfS8PcKYMRGlIbkK_52lzaZYhggZd2X71F-XKoOj9LO9fDuPj3ayWj4CrFbnsBZtYtFxZwAy0h018ZslZXfYt912SfKCe4EdgzrLiCqW68N1CY3EZY19IlKpCsONvIwjdKonCJhE7z_UPfovB9ZD9CM3RIfd5NIV32GBKOiyS9SyhiTFLs"
+        />
+      </div>
+    </header>
+    <main class="pt-24 pb-28 px-4 md:px-8 max-w-7xl mx-auto space-y-10">
+      <section
+        class="flex flex-col md:flex-row md:items-end justify-between gap-4"
+      >
+        <div>
+          <h1
+            class="font-headline text-3xl font-extrabold tracking-tight text-primary"
+          >
+            Management Overview
+          </h1>
+          <p class="text-on-surface-variant font-medium mt-1">
+            Network deployment and customer acquisition status.
+          </p>
+        </div>
+        <div
+          class="flex items-center gap-2 bg-surface-container-low px-4 py-2 rounded-xl"
+        >
+          <div class="connectivity-pulse"></div>
+          <span
+            class="text-label-sm font-semibold text-tertiary uppercase tracking-widest text-[10px]"
+            >Live Network Status</span
+          >
+        </div>
+      </section>
+
+      <section class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <a
+          href="custOnTrial.html"
+          class="block md:col-span-2 bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,30,43,0.04)] relative overflow-hidden group hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer ring-1 ring-slate-100"
+        >
+          <div
+            class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"
+          >
+            <span class="material-symbols-outlined text-8xl" data-icon="groups"
+              >groups</span
+            >
+          </div>
+          <label
+            class="font-label text-xs font-bold uppercase tracking-[0.15em] text-on-surface-variant cursor-pointer"
+          >
+            Total Trial Customers
+          </label>
+          <div class="mt-2 flex items-baseline gap-3">
+            <span class="font-headline text-4xl font-extrabold text-primary"
+              >1,428</span
+            >
+            <span
+              class="text-tertiary-container font-bold text-sm bg-tertiary-fixed px-2 py-0.5 rounded-full"
+              >Active View</span
+            >
+          </div>
+          <p
+            class="text-[12px] text-on-surface-variant mt-3 font-medium flex items-center gap-2"
+          >
+            <span class="w-2 h-2 rounded-full bg-green-500"></span> Trial Active
+            <span class="w-2 h-2 rounded-full bg-yellow-500 ml-2"></span>
+            Pending Expiry
+            <span class="w-2 h-2 rounded-full bg-red-500 ml-2"></span> Expired
+          </p>
+          <div
+            class="mt-4 h-1 w-full bg-surface-container rounded-full overflow-hidden flex"
+          >
+            <div
+              class="h-full bg-green-500"
+              style="width: 50%"
+              title="Active"
+            ></div>
+            <div
+              class="h-full bg-yellow-500"
+              style="width: 30%"
+              title="Pending Expiry"
+            ></div>
+            <div
+              class="h-full bg-red-500"
+              style="width: 20%"
+              title="Expired"
+            ></div>
+          </div>
+        </a>
+
+        <a
+          href="unconnected.html"
+          class="block bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,30,43,0.04)] hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer ring-1 ring-slate-100 group relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"
+          >
+            <span
+              class="material-symbols-outlined text-6xl"
+              data-icon="link_off"
+              >link_off</span
+            >
+          </div>
+          <label
+            class="font-label text-xs font-bold uppercase tracking-[0.15em] text-on-surface-variant cursor-pointer"
+          >
+            Unconnected
+          </label>
+          <div class="mt-2">
+            <span class="font-headline text-3xl font-extrabold text-primary"
+              >3,892</span
+            >
+          </div>
+          <div
+            class="mt-3 flex flex-col gap-1 text-[11px] text-on-surface-variant font-medium"
+          >
+            <span class="flex items-center gap-1"
+              ><span class="material-symbols-outlined text-[14px]"
+                >cell_tower</span
+              >
+              Coverage Addresses</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="material-symbols-outlined text-[14px]"
+                >explore</span
+              >
+              Pre-Trial Locations</span
+            >
+          </div>
+        </a>
+
+        <a
+          href="preOrders.html"
+          class="block bg-surface-container-lowest p-6 rounded-xl shadow-[0_4px_20px_rgba(0,30,43,0.04)] hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer ring-1 ring-slate-100 group relative overflow-hidden"
+        >
+          <div
+            class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"
+          >
+            <span
+              class="material-symbols-outlined text-6xl"
+              data-icon="shopping_cart"
+              >shopping_cart</span
+            >
+          </div>
+          <label
+            class="font-label text-xs font-bold uppercase tracking-[0.15em] text-on-surface-variant cursor-pointer"
+          >
+            Pre-Orders
+          </label>
+          <div class="mt-2">
+            <span class="font-headline text-3xl font-extrabold text-primary"
+              >412</span
+            >
+          </div>
+          <div
+            class="mt-3 flex flex-col gap-1 text-[11px] text-on-surface-variant font-medium"
+          >
+            <span class="flex items-center gap-1"
+              ><span class="material-symbols-outlined text-[14px]"
+                >pending_actions</span
+              >
+              Pending Installs</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="material-symbols-outlined text-[14px]"
+                >task_alt</span
+              >
+              Recently Installed</span
+            >
+          </div>
+        </a>
+      </section>
+
+      <section class="space-y-6">
+        <div class="bg-surface-container-low p-6 md:p-8 rounded-xl space-y-8">
+          <div class="flex items-center gap-3">
+            <span
+              class="material-symbols-outlined text-primary-container"
+              data-icon="upload_file"
+              >upload_file</span
+            >
+            <h2 class="font-headline text-xl font-bold text-primary">
+              CSV Data Administration
+            </h2>
+          </div>
+          <div class="grid grid-cols-1 gap-4">
+            <div
+              class="bg-surface-container-lowest p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:shadow-md transition-shadow"
+            >
+              <div class="space-y-1">
+                <h3 class="font-headline font-bold text-on-surface">
+                  Total Trial Customers Data
+                </h3>
+                <div
+                  class="flex items-center gap-2 text-on-surface-variant text-xs font-medium"
+                >
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    data-icon="history"
+                    >history</span
+                  >
+                  <span>Last Updated: Today, 09:42 AM</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span
+                  class="hidden md:block text-[11px] font-bold text-outline-variant uppercase tracking-tighter"
+                  >.csv only</span
+                >
+                <label
+                  class="bg-gradient-to-br from-primary to-primary-container text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-sm active:scale-95 transition-transform flex items-center gap-2 cursor-pointer"
+                >
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    data-icon="publish"
+                    >publish</span
+                  >
+                  Upload
+                  <input type="file" accept=".csv" class="hidden" />
+                </label>
+              </div>
+            </div>
+
+            <div
+              class="bg-surface-container-lowest p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:shadow-md transition-shadow"
+            >
+              <div class="space-y-1">
+                <h3 class="font-headline font-bold text-on-surface">
+                  Unconnected Accounts Data
+                </h3>
+                <div
+                  class="flex items-center gap-2 text-on-surface-variant text-xs font-medium"
+                >
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    data-icon="history"
+                    >history</span
+                  >
+                  <span>Last Updated: Oct 24, 2023</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span
+                  class="hidden md:block text-[11px] font-bold text-outline-variant uppercase tracking-tighter"
+                  >.csv only</span
+                >
+                <label
+                  class="bg-gradient-to-br from-primary to-primary-container text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-sm active:scale-95 transition-transform flex items-center gap-2 cursor-pointer"
+                >
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    data-icon="publish"
+                    >publish</span
+                  >
+                  Upload
+                  <input type="file" accept=".csv" class="hidden" />
+                </label>
+              </div>
+            </div>
+
+            <div
+              class="bg-surface-container-lowest p-5 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 group hover:shadow-md transition-shadow"
+            >
+              <div class="space-y-1">
+                <h3 class="font-headline font-bold text-on-surface">
+                  Pre-orders Data
+                </h3>
+                <div
+                  class="flex items-center gap-2 text-on-surface-variant text-xs font-medium"
+                >
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    data-icon="history"
+                    >history</span
+                  >
+                  <span>Last Updated: Oct 23, 2023</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span
+                  class="hidden md:block text-[11px] font-bold text-outline-variant uppercase tracking-tighter"
+                  >.csv only</span
+                >
+                <label
+                  class="bg-gradient-to-br from-primary to-primary-container text-white px-5 py-2.5 rounded-lg font-bold text-sm shadow-sm active:scale-95 transition-transform flex items-center gap-2 cursor-pointer"
+                >
+                  <span
+                    class="material-symbols-outlined text-sm"
+                    data-icon="publish"
+                    >publish</span
+                  >
+                  Upload
+                  <input type="file" accept=".csv" class="hidden" />
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="space-y-6">
+        <div class="bg-surface-container-low p-6 md:p-8 rounded-xl space-y-6">
+          <div
+            class="flex items-center gap-3 border-b border-outline-variant/30 pb-4"
+          >
+            <span
+              class="material-symbols-outlined text-primary-container"
+              data-icon="manage_search"
+              >manage_search</span
+            >
+            <h2 class="font-headline text-xl font-bold text-primary">
+              Recent Activities Log
+            </h2>
+          </div>
+
+          <div class="space-y-4">
+            <div
+              class="bg-surface-container-lowest p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-primary hover:bg-slate-50 transition-colors"
+            >
+              <div class="flex gap-4 items-center">
+                <div class="bg-primary/10 p-2 rounded-full hidden md:block">
+                  <span class="material-symbols-outlined text-primary text-xl"
+                    >file_upload</span
+                  >
+                </div>
+                <div>
+                  <p class="font-bold text-on-surface text-sm">
+                    Trial Customers Database Updated
+                  </p>
+                  <p class="text-[12px] text-on-surface-variant mt-1">
+                    Uploaded batch file
+                    <span class="font-mono text-xs bg-slate-100 px-1 rounded"
+                      >trials_Q4_new.csv</span
+                    >
+                    containing 1,428 records. (Admin)
+                  </p>
+                </div>
+              </div>
+              <div
+                class="text-[11px] font-bold text-outline-variant whitespace-nowrap"
+              >
+                Today, 09:42 AM
+              </div>
+            </div>
+
+            <div
+              class="bg-surface-container-lowest p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-tertiary-container hover:bg-slate-50 transition-colors"
+            >
+              <div class="flex gap-4 items-center">
+                <div
+                  class="bg-tertiary-container/10 p-2 rounded-full hidden md:block"
+                >
+                  <span
+                    class="material-symbols-outlined text-tertiary-container text-xl"
+                    >contact_mail</span
+                  >
+                </div>
+                <div>
+                  <p class="font-bold text-on-surface text-sm">
+                    Expired User Follow-Up Executed
+                  </p>
+                  <p class="text-[12px] text-on-surface-variant mt-1">
+                    Automated emails & SMS dispatched to 142 expired trial
+                    customers. (System)
+                  </p>
+                </div>
+              </div>
+              <div
+                class="text-[11px] font-bold text-outline-variant whitespace-nowrap"
+              >
+                Yesterday, 14:15 PM
+              </div>
+            </div>
+
+            <div
+              class="bg-surface-container-lowest p-4 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-secondary hover:bg-slate-50 transition-colors"
+            >
+              <div class="flex gap-4 items-center">
+                <div class="bg-secondary/10 p-2 rounded-full hidden md:block">
+                  <span class="material-symbols-outlined text-secondary text-xl"
+                    >assignment_ind</span
+                  >
+                </div>
+                <div>
+                  <p class="font-bold text-on-surface text-sm">
+                    Field Team Dispatch List Forwarded
+                  </p>
+                  <p class="text-[12px] text-on-surface-variant mt-1">
+                    Exported 'Pre-Trial Coverage' segment consisting of 312
+                    addresses to Regional Sales. (Admin)
+                  </p>
+                </div>
+              </div>
+              <div
+                class="text-[11px] font-bold text-outline-variant whitespace-nowrap"
+              >
+                Oct 24, 2023, 11:30 AM
+              </div>
+            </div>
+          </div>
+
+          <button
+            class="text-sm font-bold text-primary hover:text-cyan-600 transition-colors w-full text-center mt-4"
+          >
+            View Complete Log History
+          </button>
+        </div>
+      </section>
+    </main>
+
+    <footer
+      class="md:hidden fixed bottom-0 left-0 w-full flex justify-around items-center h-20 px-4 pb-safe bg-white shadow-[0_-4px_20px_rgba(0,30,43,0.04)] z-50 rounded-t-xl border-t border-slate-200/15"
+    >
+      <div
+        class="flex flex-col items-center justify-center bg-cyan-50 text-cyan-900 rounded-xl px-4 py-1"
+      >
+        <span class="material-symbols-outlined" data-icon="dashboard"
+          >dashboard</span
+        >
+        <span
+          class="font-inter text-[11px] font-semibold uppercase tracking-widest mt-1"
+          >Dashboard</span
+        >
+      </div>
+      <div
+        class="flex flex-col items-center justify-center text-slate-500 px-4 py-1"
+      >
+        <span class="material-symbols-outlined" data-icon="group">group</span>
+        <span
+          class="font-inter text-[11px] font-semibold uppercase tracking-widest mt-1"
+          >Customers</span
+        >
+      </div>
+      <div
+        class="flex flex-col items-center justify-center text-slate-500 px-4 py-1"
+      >
+        <span class="material-symbols-outlined" data-icon="receipt_long"
+          >receipt_long</span
+        >
+        <span
+          class="font-inter text-[11px] font-semibold uppercase tracking-widest mt-1"
+          >Queue</span
+        >
+      </div>
+      <div
+        class="flex flex-col items-center justify-center text-slate-500 px-4 py-1"
+      >
+        <span class="material-symbols-outlined" data-icon="map">map</span>
+        <span
+          class="font-inter text-[11px] font-semibold uppercase tracking-widest mt-1"
+          >Map</span
+        >
+      </div>
+    </footer>
+  </body>
+</html>

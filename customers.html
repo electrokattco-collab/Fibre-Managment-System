@@ -1,0 +1,663 @@
+<!doctype html>
+<html class="light" lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Customers | FibreForge</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: "#00435a",
+              "primary-container": "#005c7a",
+              "surface-container": "#eceef1",
+            },
+            fontFamily: { headline: ["Manrope"], body: ["Inter"] },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Smooth transitions for swapping views */
+      .view-section {
+        transition:
+          opacity 0.3s ease-in-out,
+          transform 0.3s ease-in-out;
+      }
+      .hidden-view {
+        opacity: 0;
+        transform: translateY(10px);
+        pointer-events: none;
+        position: absolute;
+        visibility: hidden;
+      }
+      .active-view {
+        opacity: 1;
+        transform: translateY(0);
+        position: relative;
+        visibility: visible;
+      }
+      /* Ensure rows fade in smoothly when searching */
+      .customer-row {
+        transition:
+          background-color 0.2s,
+          opacity 0.2s;
+      }
+    </style>
+  </head>
+  <body class="bg-[#f8f9fc] font-body text-[#191c1e] overflow-x-hidden">
+    <header
+      class="fixed top-0 w-full z-50 bg-white/80 backdrop-blur-md shadow-sm flex justify-between items-center px-6 h-16 border-b border-slate-200"
+    >
+      <div class="flex items-center gap-3">
+        <span class="material-symbols-outlined text-cyan-900">hub</span>
+        <span
+          class="font-manrope text-xl font-black tracking-tighter text-cyan-900"
+          >FibreForge</span
+        >
+      </div>
+      <nav class="hidden md:flex gap-8">
+        <a
+          class="text-slate-500 font-medium hover:text-primary transition-colors"
+          href="dashboard.html"
+          >Dashboard</a
+        >
+        <a
+          class="text-primary font-bold border-b-2 border-primary py-1"
+          href="#"
+          >Customers</a
+        >
+        <a
+          class="text-slate-500 font-medium hover:text-primary transition-colors"
+          href="#"
+          >Queue</a
+        >
+      </nav>
+      <div class="flex items-center gap-4">
+        <button class="text-slate-500 hover:text-primary transition-colors">
+          <span class="material-symbols-outlined">notifications</span>
+        </button>
+        <div
+          class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center font-bold text-xs shadow-sm"
+        >
+          AD
+        </div>
+      </div>
+    </header>
+
+    <main class="pt-24 pb-20 px-4 md:px-8 max-w-7xl mx-auto w-full relative">
+      <div id="management-view" class="view-section active-view space-y-8">
+        <div
+          class="flex flex-col md:flex-row justify-between items-start md:items-end gap-4"
+        >
+          <div>
+            <h1 class="font-headline text-3xl font-extrabold text-primary">
+              Customer Directory
+            </h1>
+            <p class="text-slate-500 font-medium mt-1">
+              Search, filter, and manage your entire subscriber base.
+            </p>
+          </div>
+          <button
+            class="bg-primary text-white px-5 py-2.5 rounded-lg font-bold text-sm hover:bg-primary-container shadow-md shadow-primary/20 transition-all flex items-center gap-2 active:scale-95"
+          >
+            <span class="material-symbols-outlined text-sm">person_add</span>
+            Add Customer
+          </button>
+        </div>
+
+        <div
+          class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-4 items-center justify-between"
+        >
+          <div class="relative w-full md:w-96">
+            <span
+              class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px]"
+              >search</span
+            >
+            <input
+              type="text"
+              id="searchInput"
+              placeholder="Search by name, address, or ID..."
+              class="w-full pl-9 pr-4 py-2 rounded-lg border border-slate-200 text-sm focus:ring-2 focus:ring-primary focus:border-primary transition-all"
+            />
+          </div>
+          <div class="flex gap-2 w-full md:w-auto">
+            <select
+              id="statusFilter"
+              class="border-slate-200 rounded-lg text-sm text-slate-600 focus:ring-primary w-full md:w-auto cursor-pointer"
+            >
+              <option value="all">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="pending">Pending</option>
+              <option value="suspended">Suspended</option>
+            </select>
+            <button
+              class="bg-slate-100 text-slate-600 border border-slate-200 px-4 py-2 rounded-lg font-bold text-sm hover:bg-slate-200 flex items-center gap-2 transition-colors"
+            >
+              <span class="material-symbols-outlined text-sm">tune</span>
+              Filters
+            </button>
+          </div>
+        </div>
+
+        <section
+          class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden"
+        >
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+              <thead>
+                <tr
+                  class="bg-slate-50 text-[11px] uppercase tracking-wider text-slate-500 font-bold border-b border-slate-200"
+                >
+                  <th class="px-6 py-4">Customer Details</th>
+                  <th class="px-6 py-4">Account ID</th>
+                  <th class="px-6 py-4">Status</th>
+                  <th class="px-6 py-4">Current Plan</th>
+                  <th class="px-6 py-4 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100" id="customerTableBody">
+                <tr
+                  class="customer-row hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                  data-name="Sarah Jenkins"
+                  data-id="ACC-9921"
+                  data-status="Active"
+                  data-plan="1Gbps Fibre Plus"
+                  data-address="45 Oak Street, Block C"
+                  data-ip="192.168.10.44 (Static)"
+                  data-usage="428 GB"
+                  data-balance="R 899.00"
+                  onclick="loadCustomerProfile(this)"
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-9 h-9 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-xs"
+                      >
+                        SJ
+                      </div>
+                      <div>
+                        <div
+                          class="font-bold text-sm text-slate-800 group-hover:text-primary transition-colors name-cell"
+                        >
+                          Sarah Jenkins
+                        </div>
+                        <div class="text-[11px] text-slate-500 font-medium">
+                          45 Oak Street, Block C
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    class="px-6 py-4 text-sm font-mono text-slate-500 id-cell"
+                  >
+                    ACC-9921
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="px-2.5 py-1 rounded-md bg-green-100 text-green-700 text-[10px] font-bold uppercase tracking-wide border border-green-200"
+                      >Active</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-sm font-medium text-slate-700">
+                    1Gbps Fibre Plus
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <button
+                      class="text-slate-400 group-hover:text-primary font-bold text-xs flex items-center gap-1 ml-auto transition-colors"
+                    >
+                      View
+                      <span class="material-symbols-outlined text-[14px]"
+                        >chevron_right</span
+                      >
+                    </button>
+                  </td>
+                </tr>
+
+                <tr
+                  class="customer-row hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                  data-name="Michael Ross"
+                  data-id="ACC-8812"
+                  data-status="Suspended"
+                  data-plan="500Mbps Standard"
+                  data-address="89 Industrial Way"
+                  data-ip="Offline"
+                  data-usage="0 GB"
+                  data-balance="R 1,450.00 (Overdue)"
+                  onclick="loadCustomerProfile(this)"
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-9 h-9 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center font-bold text-xs"
+                      >
+                        MR
+                      </div>
+                      <div>
+                        <div
+                          class="font-bold text-sm text-slate-800 group-hover:text-primary transition-colors name-cell"
+                        >
+                          Michael Ross
+                        </div>
+                        <div class="text-[11px] text-slate-500 font-medium">
+                          89 Industrial Way
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    class="px-6 py-4 text-sm font-mono text-slate-500 id-cell"
+                  >
+                    ACC-8812
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="px-2.5 py-1 rounded-md bg-red-100 text-red-700 text-[10px] font-bold uppercase tracking-wide border border-red-200"
+                      >Suspended</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-sm font-medium text-slate-700">
+                    500Mbps Standard
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <button
+                      class="text-slate-400 group-hover:text-primary font-bold text-xs flex items-center gap-1 ml-auto transition-colors"
+                    >
+                      View
+                      <span class="material-symbols-outlined text-[14px]"
+                        >chevron_right</span
+                      >
+                    </button>
+                  </td>
+                </tr>
+
+                <tr
+                  class="customer-row hover:bg-slate-50/80 transition-colors cursor-pointer group"
+                  data-name="Emily Chen"
+                  data-id="ACC-9945"
+                  data-status="Pending"
+                  data-plan="200Mbps Essential"
+                  data-address="12 Horizon View"
+                  data-ip="Not Assigned"
+                  data-usage="N/A"
+                  data-balance="R 0.00"
+                  onclick="loadCustomerProfile(this)"
+                >
+                  <td class="px-6 py-4">
+                    <div class="flex items-center gap-3">
+                      <div
+                        class="w-9 h-9 rounded-full bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-xs"
+                      >
+                        EC
+                      </div>
+                      <div>
+                        <div
+                          class="font-bold text-sm text-slate-800 group-hover:text-primary transition-colors name-cell"
+                        >
+                          Emily Chen
+                        </div>
+                        <div class="text-[11px] text-slate-500 font-medium">
+                          12 Horizon View
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td
+                    class="px-6 py-4 text-sm font-mono text-slate-500 id-cell"
+                  >
+                    ACC-9945
+                  </td>
+                  <td class="px-6 py-4">
+                    <span
+                      class="px-2.5 py-1 rounded-md bg-amber-100 text-amber-700 text-[10px] font-bold uppercase tracking-wide border border-amber-200"
+                      >Pending Install</span
+                    >
+                  </td>
+                  <td class="px-6 py-4 text-sm font-medium text-slate-700">
+                    200Mbps Essential
+                  </td>
+                  <td class="px-6 py-4 text-right">
+                    <button
+                      class="text-slate-400 group-hover:text-primary font-bold text-xs flex items-center gap-1 ml-auto transition-colors"
+                    >
+                      View
+                      <span class="material-symbols-outlined text-[14px]"
+                        >chevron_right</span
+                      >
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div
+            class="border-t border-slate-200 p-4 flex items-center justify-between bg-slate-50/50"
+          >
+            <span class="text-xs font-medium text-slate-500"
+              >Showing results based on filters</span
+            >
+            <div class="flex gap-1">
+              <button
+                class="px-3 py-1 border border-slate-200 rounded text-slate-400 cursor-not-allowed bg-white text-xs font-bold"
+              >
+                Prev
+              </button>
+              <button
+                class="px-3 py-1 bg-primary text-white rounded text-xs font-bold"
+              >
+                1
+              </button>
+              <button
+                class="px-3 py-1 border border-slate-200 rounded text-slate-600 hover:bg-slate-100 bg-white text-xs font-bold transition-colors"
+              >
+                Next
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div id="details-view" class="view-section hidden-view space-y-6 w-full">
+        <div>
+          <button
+            onclick="toggleView('management-view')"
+            class="flex items-center gap-2 text-sm font-bold text-slate-500 mb-6 hover:text-primary transition-colors"
+          >
+            <span class="material-symbols-outlined text-sm">arrow_back</span>
+            Back to Directory
+          </button>
+
+          <div
+            class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"
+          >
+            <div class="flex items-center gap-5">
+              <div
+                class="w-16 h-16 rounded-full bg-cyan-100 text-cyan-700 flex items-center justify-center font-bold text-2xl shadow-inner border border-cyan-200"
+                id="detail-initials"
+              >
+                SJ
+              </div>
+              <div>
+                <h1
+                  class="font-headline text-2xl font-extrabold text-slate-800"
+                  id="detail-name"
+                >
+                  Customer Name
+                </h1>
+                <div class="flex items-center gap-3 mt-1.5">
+                  <span
+                    class="text-sm font-mono text-slate-500 font-medium"
+                    id="detail-id"
+                    >ACC-0000</span
+                  >
+                  <span class="text-slate-300">•</span>
+                  <span
+                    class="text-xs text-slate-500 font-medium flex items-center gap-1"
+                    ><span class="material-symbols-outlined text-[14px]"
+                      >location_on</span
+                    >
+                    <span id="detail-address">Address</span></span
+                  >
+                </div>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button
+                class="p-2.5 border border-slate-200 bg-slate-50 rounded-lg text-slate-600 hover:text-primary hover:bg-slate-100 transition-all shadow-sm"
+                title="Edit Profile"
+              >
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+              </button>
+              <button
+                class="bg-slate-800 text-white px-5 py-2.5 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-black transition-all shadow-md active:scale-95"
+              >
+                <span class="material-symbols-outlined text-[18px]">build</span>
+                Run Diagnostics
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="md:col-span-2 space-y-6">
+            <div
+              class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm"
+            >
+              <div
+                class="flex items-center justify-between mb-6 border-b border-slate-100 pb-3"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="material-symbols-outlined text-primary"
+                    >router</span
+                  >
+                  <h2 class="font-headline font-bold text-lg text-slate-800">
+                    Connection Details
+                  </h2>
+                </div>
+                <span
+                  id="detail-status-badge"
+                  class="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide border"
+                  >Status</span
+                >
+              </div>
+
+              <div class="grid grid-cols-2 gap-y-6 gap-x-4">
+                <div>
+                  <p
+                    class="text-[11px] text-slate-400 font-bold uppercase tracking-wider"
+                  >
+                    Active Plan
+                  </p>
+                  <p
+                    class="text-base font-bold text-slate-800 mt-1"
+                    id="detail-plan"
+                  >
+                    1Gbps Fibre Plus
+                  </p>
+                </div>
+                <div>
+                  <p
+                    class="text-[11px] text-slate-400 font-bold uppercase tracking-wider"
+                  >
+                    ONT Status
+                  </p>
+                  <p
+                    class="text-base font-bold mt-1 flex items-center gap-1.5"
+                    id="detail-ont"
+                  >
+                    <span
+                      class="w-2.5 h-2.5 rounded-full bg-slate-300"
+                      id="ont-indicator"
+                    ></span>
+                    <span id="ont-text">Unknown</span>
+                  </p>
+                </div>
+                <div>
+                  <p
+                    class="text-[11px] text-slate-400 font-bold uppercase tracking-wider"
+                  >
+                    IP Address
+                  </p>
+                  <p
+                    class="text-sm font-mono text-slate-700 mt-1 bg-slate-50 py-1 px-2 rounded inline-block border border-slate-100"
+                    id="detail-ip"
+                  >
+                    192.168.10.44
+                  </p>
+                </div>
+                <div>
+                  <p
+                    class="text-[11px] text-slate-400 font-bold uppercase tracking-wider"
+                  >
+                    Data Usage (MTD)
+                  </p>
+                  <p class="text-base font-bold text-slate-700 mt-1">
+                    <span id="detail-usage" class="text-primary">428 GB</span>
+                    <span class="text-xs font-normal text-slate-400"
+                      >/ Uncapped</span
+                    >
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div
+            class="bg-gradient-to-b from-primary/5 to-transparent p-6 rounded-2xl border border-primary/10 h-max"
+          >
+            <div
+              class="flex items-center gap-2 mb-4 border-b border-primary/10 pb-3"
+            >
+              <span class="material-symbols-outlined text-primary"
+                >receipt_long</span
+              >
+              <h2 class="font-headline font-bold text-lg text-primary">
+                Billing Overview
+              </h2>
+            </div>
+            <div class="space-y-5">
+              <div>
+                <p
+                  class="text-[11px] text-slate-500 font-bold uppercase tracking-wider"
+                >
+                  Current Balance
+                </p>
+                <p
+                  class="text-3xl font-black text-slate-800 mt-1"
+                  id="detail-balance"
+                >
+                  R 899.00
+                </p>
+              </div>
+              <button
+                class="w-full bg-white border-2 border-primary text-primary py-2.5 rounded-xl font-bold text-sm hover:bg-primary hover:text-white transition-all shadow-sm active:scale-95"
+              >
+                Process Payment
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      // === 1. UNIFIED FILTERING (SEARCH + STATUS) ===
+      const searchInput = document.getElementById("searchInput");
+      const statusFilter = document.getElementById("statusFilter");
+      const rows = document.querySelectorAll(".customer-row");
+
+      function applyFilters() {
+        const term = searchInput.value.toLowerCase();
+        const statusValue = statusFilter.value.toLowerCase();
+
+        rows.forEach((row) => {
+          const name = row.getAttribute("data-name").toLowerCase();
+          const id = row.getAttribute("data-id").toLowerCase();
+          const address = row.getAttribute("data-address").toLowerCase();
+          const status = row.getAttribute("data-status").toLowerCase();
+
+          // Check if it matches search term
+          const matchesSearch =
+            term === "" ||
+            name.includes(term) ||
+            id.includes(term) ||
+            address.includes(term);
+
+          // Check if it matches status dropdown (e.g. "Pending Install" matches "pending")
+          const matchesStatus =
+            statusValue === "all" || status.includes(statusValue);
+
+          if (matchesSearch && matchesStatus) {
+            row.style.display = "";
+            row.style.opacity = "1";
+          } else {
+            row.style.display = "none";
+            row.style.opacity = "0";
+          }
+        });
+      }
+
+      // Trigger filters on typing or changing dropdown
+      searchInput.addEventListener("keyup", applyFilters);
+      statusFilter.addEventListener("change", applyFilters);
+
+      // === 2. DYNAMIC VIEW SWITCHING & DATA BINDING ===
+      function loadCustomerProfile(rowElement) {
+        const dataset = rowElement.dataset;
+
+        document.getElementById("detail-name").innerText = dataset.name;
+        document.getElementById("detail-id").innerText = dataset.id;
+        document.getElementById("detail-plan").innerText = dataset.plan;
+        document.getElementById("detail-address").innerText = dataset.address;
+        document.getElementById("detail-ip").innerText = dataset.ip;
+        document.getElementById("detail-usage").innerText = dataset.usage;
+        document.getElementById("detail-balance").innerText = dataset.balance;
+
+        const initials = dataset.name
+          .split(" ")
+          .map((n) => n[0])
+          .join("")
+          .substring(0, 2);
+        document.getElementById("detail-initials").innerText = initials;
+
+        const badge = document.getElementById("detail-status-badge");
+        const ontIndicator = document.getElementById("ont-indicator");
+        const ontText = document.getElementById("ont-text");
+
+        badge.innerText = dataset.status;
+
+        if (dataset.status.toLowerCase() === "active") {
+          badge.className =
+            "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-green-100 text-green-700 border border-green-200";
+          ontIndicator.className =
+            "w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse";
+          ontText.innerText = "Online";
+          ontText.className = "text-green-600";
+        } else if (dataset.status.toLowerCase() === "suspended") {
+          badge.className =
+            "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-red-100 text-red-700 border border-red-200";
+          ontIndicator.className = "w-2.5 h-2.5 rounded-full bg-red-500";
+          ontText.innerText = "Offline (Suspended)";
+          ontText.className = "text-red-600";
+        } else {
+          badge.className =
+            "px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wide bg-amber-100 text-amber-700 border border-amber-200";
+          ontIndicator.className = "w-2.5 h-2.5 rounded-full bg-slate-300";
+          ontText.innerText = "No Connection";
+          ontText.className = "text-slate-500";
+        }
+
+        toggleView("details-view");
+      }
+
+      function toggleView(targetViewId) {
+        const mgmtView = document.getElementById("management-view");
+        const detailView = document.getElementById("details-view");
+
+        if (targetViewId === "details-view") {
+          mgmtView.classList.replace("active-view", "hidden-view");
+          setTimeout(() => {
+            detailView.classList.replace("hidden-view", "active-view");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }, 200);
+        } else {
+          detailView.classList.replace("active-view", "hidden-view");
+          setTimeout(() => {
+            mgmtView.classList.replace("hidden-view", "active-view");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }, 200);
+        }
+      }
+    </script>
+  </body>
+</html>
